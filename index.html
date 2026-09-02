@@ -303,6 +303,34 @@
     font:800 13px/1 var(--jp);color:var(--ink);cursor:pointer;
   }
 
+  /* ---- qr ---- */
+  .corner-left{
+    position:fixed;top:max(10px,env(safe-area-inset-top));left:12px;
+    display:flex;gap:8px;z-index:5;
+  }
+  .chip .qr-ico{width:15px;height:15px;display:block}
+
+  .sheet .qrcard{position:relative;max-width:360px;text-align:center}
+  .qrclose{
+    position:absolute;top:10px;right:10px;
+    width:30px;height:30px;border-radius:50%;
+    border:1px solid var(--card-rule);
+    background:transparent;color:var(--ink-soft);
+    font:600 14px/1 var(--jp);
+    display:grid;place-items:center;cursor:pointer;
+    transition:background .18s ease, color .18s ease;
+  }
+  .qrclose:hover,.qrclose:focus-visible{background:var(--key-b);color:var(--ink)}
+  .qrclose:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+  .qrbox{
+    width:100%;max-width:min(300px,44vh);margin:2px auto 0;
+    background:#fff;border-radius:10px;padding:8px;
+  }
+  .qrbox svg{display:block;width:100%;height:auto}
+  .qrurl{
+    margin:12px 0 0;font-size:11.5px;color:var(--ink-soft);word-break:break-all;
+  }
+
   @media (prefers-reduced-motion:reduce){
     .paddle{transition:none}
     .paddle.pop,.pulse.go{animation:none}
@@ -314,6 +342,15 @@
 <div class="corner">
   <button class="chip" id="theme" aria-label="背景を切り替える" aria-pressed="true">◐</button>
   <button class="chip" id="info" aria-label="キー操作と効果音のクレジット">i</button>
+</div>
+
+<div class="corner-left">
+  <button class="chip" id="qrbtn" aria-label="このページのQRコードを表示">
+    <svg class="qr-ico" viewBox="0 0 12 12" aria-hidden="true">
+      <path fill="currentColor" fill-rule="evenodd" d="M0 0h5v5H0zM1.5 1.5h2v2h-2zM7 0h5v5H7zM8.5 1.5h2v2h-2zM0 7h5v5H0zM1.5 8.5h2v2h-2z"/>
+      <path fill="currentColor" d="M7 7h2v2H7zM10 7h2v2h-2zM7 10h2v2H7zM10 10h2v2h-2z"/>
+    </svg>
+  </button>
 </div>
 
 <div class="stage">
@@ -365,6 +402,20 @@
     </dl>
     <p class="credit">効果音：OtoLogic（<a href="https://otologic.jp" target="_blank" rel="noopener">otologic.jp</a>）／ CC BY 4.0</p>
     <button class="close" id="close">閉じる</button>
+  </div>
+</div>
+
+<div class="sheet" id="qrsheet" role="dialog" aria-modal="true" aria-label="このページのQRコード">
+  <div class="card qrcard">
+    <button class="qrclose" id="qrclose" aria-label="閉じる">✕</button>
+    <h2>スマホで開く</h2>
+    <div class="qrbox">
+      <svg viewBox="0 0 37 37" shape-rendering="crispEdges" role="img" aria-label="https://dzr01145.github.io/buzzer/ のQRコード">
+        <rect width="37" height="37" fill="#fff"/>
+        <path fill="#000" d="M4 4h7v1h-7zM12 4h5v1h-5zM19 4h2v1h-2zM22 4h3v1h-3zM26 4h7v1h-7zM4 5h1v1h-1zM10 5h1v1h-1zM12 5h2v1h-2zM16 5h1v1h-1zM18 5h2v1h-2zM26 5h1v1h-1zM32 5h1v1h-1zM4 6h1v1h-1zM6 6h3v1h-3zM10 6h1v1h-1zM17 6h3v1h-3zM23 6h2v1h-2zM26 6h1v1h-1zM28 6h3v1h-3zM32 6h1v1h-1zM4 7h1v1h-1zM6 7h3v1h-3zM10 7h1v1h-1zM12 7h1v1h-1zM14 7h2v1h-2zM21 7h2v1h-2zM24 7h1v1h-1zM26 7h1v1h-1zM28 7h3v1h-3zM32 7h1v1h-1zM4 8h1v1h-1zM6 8h3v1h-3zM10 8h1v1h-1zM14 8h1v1h-1zM17 8h1v1h-1zM23 8h1v1h-1zM26 8h1v1h-1zM28 8h3v1h-3zM32 8h1v1h-1zM4 9h1v1h-1zM10 9h1v1h-1zM13 9h1v1h-1zM15 9h1v1h-1zM18 9h1v1h-1zM20 9h4v1h-4zM26 9h1v1h-1zM32 9h1v1h-1zM4 10h7v1h-7zM12 10h1v1h-1zM14 10h1v1h-1zM16 10h1v1h-1zM18 10h1v1h-1zM20 10h1v1h-1zM22 10h1v1h-1zM24 10h1v1h-1zM26 10h7v1h-7zM12 11h1v1h-1zM16 11h3v1h-3zM21 11h1v1h-1zM24 11h1v1h-1zM4 12h1v1h-1zM6 12h2v1h-2zM9 12h3v1h-3zM14 12h2v1h-2zM17 12h2v1h-2zM20 12h3v1h-3zM26 12h1v1h-1zM29 12h1v1h-1zM31 12h2v1h-2zM4 13h2v1h-2zM8 13h1v1h-1zM12 13h2v1h-2zM15 13h2v1h-2zM19 13h1v1h-1zM21 13h4v1h-4zM26 13h1v1h-1zM28 13h1v1h-1zM32 13h1v1h-1zM5 14h1v1h-1zM7 14h1v1h-1zM10 14h1v1h-1zM13 14h1v1h-1zM15 14h1v1h-1zM18 14h1v1h-1zM20 14h2v1h-2zM24 14h1v1h-1zM27 14h1v1h-1zM30 14h2v1h-2zM4 15h1v1h-1zM6 15h1v1h-1zM9 15h1v1h-1zM11 15h1v1h-1zM13 15h1v1h-1zM15 15h5v1h-5zM22 15h5v1h-5zM32 15h1v1h-1zM6 16h1v1h-1zM8 16h1v1h-1zM10 16h1v1h-1zM13 16h1v1h-1zM15 16h1v1h-1zM21 16h1v1h-1zM24 16h2v1h-2zM27 16h1v1h-1zM29 16h2v1h-2zM7 17h1v1h-1zM11 17h1v1h-1zM14 17h1v1h-1zM17 17h1v1h-1zM19 17h1v1h-1zM23 17h1v1h-1zM25 17h3v1h-3zM30 17h3v1h-3zM4 18h2v1h-2zM7 18h5v1h-5zM13 18h4v1h-4zM18 18h1v1h-1zM20 18h5v1h-5zM26 18h1v1h-1zM28 18h1v1h-1zM30 18h3v1h-3zM5 19h1v1h-1zM8 19h2v1h-2zM11 19h2v1h-2zM16 19h2v1h-2zM28 19h1v1h-1zM31 19h1v1h-1zM6 20h2v1h-2zM10 20h1v1h-1zM12 20h1v1h-1zM20 20h1v1h-1zM23 20h2v1h-2zM28 20h2v1h-2zM31 20h1v1h-1zM5 21h1v1h-1zM9 21h1v1h-1zM12 21h2v1h-2zM15 21h3v1h-3zM19 21h1v1h-1zM21 21h1v1h-1zM24 21h2v1h-2zM27 21h1v1h-1zM29 21h3v1h-3zM4 22h1v1h-1zM7 22h1v1h-1zM10 22h7v1h-7zM19 22h3v1h-3zM24 22h1v1h-1zM30 22h1v1h-1zM6 23h1v1h-1zM8 23h2v1h-2zM14 23h1v1h-1zM20 23h4v1h-4zM27 23h2v1h-2zM30 23h1v1h-1zM5 24h1v1h-1zM9 24h2v1h-2zM12 24h1v1h-1zM14 24h1v1h-1zM17 24h1v1h-1zM20 24h11v1h-11zM12 25h1v1h-1zM16 25h3v1h-3zM20 25h1v1h-1zM22 25h1v1h-1zM24 25h1v1h-1zM28 25h5v1h-5zM4 26h7v1h-7zM12 26h2v1h-2zM16 26h2v1h-2zM23 26h2v1h-2zM26 26h1v1h-1zM28 26h2v1h-2zM31 26h1v1h-1zM4 27h1v1h-1zM10 27h1v1h-1zM12 27h4v1h-4zM19 27h2v1h-2zM24 27h1v1h-1zM28 27h2v1h-2zM4 28h1v1h-1zM6 28h3v1h-3zM10 28h1v1h-1zM15 28h1v1h-1zM18 28h1v1h-1zM20 28h2v1h-2zM24 28h5v1h-5zM30 28h2v1h-2zM4 29h1v1h-1zM6 29h3v1h-3zM10 29h1v1h-1zM12 29h1v1h-1zM14 29h1v1h-1zM17 29h6v1h-6zM28 29h2v1h-2zM32 29h1v1h-1zM4 30h1v1h-1zM6 30h3v1h-3zM10 30h1v1h-1zM12 30h1v1h-1zM14 30h2v1h-2zM18 30h1v1h-1zM20 30h1v1h-1zM22 30h1v1h-1zM24 30h2v1h-2zM27 30h1v1h-1zM30 30h1v1h-1zM32 30h1v1h-1zM4 31h1v1h-1zM10 31h1v1h-1zM13 31h3v1h-3zM18 31h1v1h-1zM24 31h1v1h-1zM28 31h2v1h-2zM31 31h1v1h-1zM4 32h7v1h-7zM12 32h2v1h-2zM16 32h1v1h-1zM19 32h2v1h-2zM22 32h1v1h-1zM24 32h2v1h-2zM31 32h1v1h-1z"/>
+      </svg>
+    </div>
+    <p class="qrurl">dzr01145.github.io/buzzer/</p>
   </div>
 </div>
 
@@ -485,10 +536,18 @@
   document.getElementById('close').addEventListener('click', closeSheet);
   sheet.addEventListener('click', function(e){ if(e.target === sheet) closeSheet(); });
 
+  /* ---------- qr sheet ---------- */
+  var qrsheet = document.getElementById('qrsheet');
+  function openQr(){ qrsheet.dataset.open = '1'; document.getElementById('qrclose').focus(); }
+  function closeQr(){ qrsheet.dataset.open = ''; }
+  document.getElementById('qrbtn').addEventListener('click', openQr);
+  document.getElementById('qrclose').addEventListener('click', closeQr);
+  qrsheet.addEventListener('click', function(e){ if(e.target === qrsheet) closeQr(); });
+
   document.addEventListener('keydown', function(e){
     if(e.repeat) return;
-    if(e.key === 'Escape'){ closeSheet(); return; }
-    if(sheet.dataset.open === '1') return;
+    if(e.key === 'Escape'){ closeSheet(); closeQr(); return; }
+    if(sheet.dataset.open === '1' || qrsheet.dataset.open === '1') return;
     var k = e.key.toLowerCase();
     if(k === '1' || k === 'o'){ e.preventDefault(); fire('maru'); }
     else if(k === '2' || k === 'x'){ e.preventDefault(); fire('batsu'); }
