@@ -270,6 +270,33 @@
   .chip:hover,.chip:focus-visible{opacity:1}
   .chip:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 
+  .note{
+    position:fixed;
+    top:max(14px,env(safe-area-inset-top));
+    left:16px;
+    font-size:clamp(26px,7vw,38px);
+    line-height:1;
+    color:#FFD100;
+    text-shadow:0 2px 6px rgba(0,0,0,.4);
+    opacity:0;
+    pointer-events:none;
+    z-index:5;
+    transition:opacity .15s ease;
+  }
+  .note.on{opacity:1;animation:noteShake .15s linear infinite}
+  @keyframes noteShake{
+    0%,100%{translate:0 0}
+    10%{translate:-2px -1px}
+    20%{translate:2px 1px}
+    30%{translate:-2px 1px}
+    40%{translate:2px -1px}
+    50%{translate:-1px -2px}
+    60%{translate:1px 2px}
+    70%{translate:-2px 0}
+    80%{translate:2px 0}
+    90%{translate:-1px 1px}
+  }
+
   .sheet{
     position:fixed;inset:0;
     display:none;place-items:center;
@@ -306,6 +333,7 @@
   @media (prefers-reduced-motion:reduce){
     .paddle{transition:none}
     .paddle.pop,.pulse.go{animation:none}
+    .note.on{animation:none}
   }
 </style>
 </head>
@@ -315,6 +343,8 @@
   <button class="chip" id="theme" aria-label="背景を切り替える" aria-pressed="true">◐</button>
   <button class="chip" id="info" aria-label="キー操作と効果音のクレジット">i</button>
 </div>
+
+<div class="note" id="note" aria-hidden="true">♪</div>
 
 <div class="stage">
   <div class="tapzone" aria-hidden="true">
@@ -411,21 +441,41 @@
     });
   }
 
+  /* ---------- note icon: shakes while a sound is actually playing ---------- */
+  var noteEl = document.getElementById('note');
+  var noteTimer = null;
+  function noteOn(){
+    clearTimeout(noteTimer);
+    noteEl.classList.add('on');
+    noteTimer = setTimeout(noteOff, 3000);
+  }
+  function noteOff(){
+    clearTimeout(noteTimer);
+    noteEl.classList.remove('on');
+  }
+
   function play(kind){
     initAudio();
+    noteOn();
     if(ctx){
       if(ctx.state === 'suspended') ctx.resume();
       if(buffers[kind]){
         var s = ctx.createBufferSource();
         s.buffer = buffers[kind];
         s.connect(ctx.destination);
+        s.onended = noteOff;
         s.start(0);
         return;
       }
     }
     initFallback();
     var a = fallback[kind];
-    if(a){ try{ a.currentTime = 0; a.play(); }catch(e){} }
+    if(a){
+      a.onended = noteOff;
+      try{ a.currentTime = 0; a.play(); }catch(e){ noteOff(); }
+    } else {
+      noteOff();
+    }
   }
 
   /* ---------- visuals ---------- */
