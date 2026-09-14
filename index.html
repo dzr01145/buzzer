@@ -361,12 +361,28 @@
   .sheet .credit{border-top:1px solid var(--card-rule);padding-top:12px;margin:0;font-size:10px;opacity:.7}
   .sheet a{color:var(--ink)}
   .sheet .credit a{color:inherit}
+  .sheet .dl{
+    display:block;margin-top:16px;padding:10px 11px;
+    border-radius:12px;border:1px solid var(--key-edge);
+    background:transparent;
+    font:800 13px/1 var(--jp);color:var(--ink);
+    text-align:center;text-decoration:none;
+    transition:background .18s ease;
+  }
+  .sheet .dl small{
+    display:block;margin-top:5px;
+    font:600 10px/1 var(--jp);color:var(--ink-soft);
+  }
+  .sheet .dl:hover,.sheet .dl:focus-visible{background:var(--key-b)}
+  .sheet .dl:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
   .sheet .close{
     margin-top:16px;width:100%;padding:11px;
     border-radius:12px;border:1px solid var(--key-edge);
     background:linear-gradient(180deg,var(--key-a),var(--key-b));
     font:800 13px/1 var(--jp);color:var(--ink);cursor:pointer;
   }
+  .sheet .dl + .close{margin-top:8px}
 
   /* ---- qr ---- */
   .corner-left{
@@ -479,7 +495,13 @@
       <dt>スペース</dt><dd>裏返す</dd>
       <dt>B</dt><dd>背景の白／黒</dd>
     </dl>
-    <p class="credit">効果音：OtoLogic（<a href="https://otologic.jp" target="_blank" rel="noopener">otologic.jp</a>）／ CC BY 4.0</p>
+    <p class="credit">
+      効果音：OtoLogic（<a href="https://otologic.jp" target="_blank" rel="noopener">otologic.jp</a>）／ CC BY 4.0<br>
+      拍手アイコン：Twemoji（Twitter, Inc and other contributors）／ CC BY 4.0
+    </p>
+    <a class="dl" id="dl" href="index.html" download="marubatsu-buzzer.html" hidden>
+      HTMLファイルを保存<small>1ファイルだけでオフライン動作します</small>
+    </a>
     <button class="close" id="close">閉じる</button>
   </div>
 </div>
@@ -671,6 +693,12 @@
 
   /* offline cache — only when served over http(s); a local file:// copy is
      already self-contained, so registration is skipped there */
+  /* the save link only makes sense on a served copy — a local file:// copy is
+     already the very file it would hand out */
+  if(location.protocol.indexOf('http') === 0){
+    document.getElementById('dl').hidden = false;
+  }
+
   if(location.protocol.indexOf('http') === 0 && 'serviceWorker' in navigator){
     window.addEventListener('load', function(){
       navigator.serviceWorker.register('sw.js').catch(function(){});

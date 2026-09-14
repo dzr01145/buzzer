@@ -30,6 +30,7 @@
 | `icon-*.png` | アプリアイコン |
 
 `index.html` は単体でも動作します。ダウンロードしてブラウザで開くだけで使えます。
+公開ページからは、画面右上の「i」ボタン内の「HTMLファイルを保存」からも取得できます。
 
 ## 更新するとき
 
@@ -41,6 +42,9 @@
 
 効果音：[OtoLogic](https://otologic.jp) ／ CC BY 4.0
 （Quiz-Ding_Dong03、Quiz-Buzzer02、Applause03 を一部加工して使用）
+
+拍手アイコン：[Twemoji](https://github.com/jdecked/twemoji) ／ CC BY 4.0
+（Copyright 2020 Twitter, Inc and other contributors）
 
 クレジット表記は画面右上の「i」ボタン内に表示しています。
 CC BY 4.0 の条件のため、この表記は削除しないでください。
