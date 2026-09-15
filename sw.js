@@ -1,6 +1,6 @@
 /* ○×ブザー — offline cache
    Bump CACHE when any file changes, otherwise browsers keep serving the old copy. */
-var CACHE = 'marubatsu-v10';
+var CACHE = 'marubatsu-v11';
 var ASSETS = [
   './',
   './index.html',
