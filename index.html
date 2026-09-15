@@ -71,21 +71,41 @@
     padding:max(18px,env(safe-area-inset-top)) 20px max(22px,env(safe-area-inset-bottom));
     -webkit-tap-highlight-color:transparent;
     overflow:hidden;
+    /* a stray drag must never start a text selection or a double-tap zoom —
+       either one swallows the tap and the buzzer feels dead */
+    -webkit-user-select:none;user-select:none;
+    touch-action:manipulation;
   }
 
   /* ---- stage ---- */
   .stage{
     flex:1 1 auto;
+    position:relative;
     display:flex;align-items:center;justify-content:center;
     pointer-events:none;
-    perspective:1400px;
     width:100%;
     min-height:0;
+  }
+  /* shown to someone sitting opposite: only the toy turns. The tap halves sit
+     outside this element, so left stays left for whoever holds the phone. */
+  .tapzone{
+    display:block;
+    perspective:1400px;
     transition:transform .5s cubic-bezier(.3,.8,.35,1);
   }
-  /* shown to someone sitting opposite: only the toy turns, the keys stay put */
-  .stage.facing{transform:rotate(180deg)}
-  .tapzone{display:block}
+  .tapzone.facing{transform:rotate(180deg)}
+
+  /* the toy itself is a target: left half ○, right half × */
+  .half{
+    position:absolute;top:0;bottom:0;width:50%;
+    margin:0;padding:0;border:0;background:transparent;
+    pointer-events:auto;cursor:pointer;
+    touch-action:manipulation;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .half.left{left:0}
+  .half.right{right:0}
+  .half:focus-visible{outline:3px solid var(--ink);outline-offset:-8px;border-radius:24px}
 
   .paddle{
     position:relative;
@@ -244,11 +264,12 @@
     box-shadow:0 -6px 22px -14px rgba(0,0,0,.5);
     font-family:inherit;
     color:var(--ink);cursor:pointer;
+    touch-action:manipulation;
     transition:background .4s ease, color .4s ease, filter .08s ease;
   }
   /* outer top corners sweep up; the pair meets in the middle */
-  .key.maru {border-radius:44px 0 0 0; padding-right:8%; border-right:1px solid var(--key-edge)}
-  .key.batsu{border-radius:0 44px 0 0; padding-left:8%}
+  .key.maru {border-radius:44px 0 0 0; border-right:1px solid var(--key-edge)}
+  .key.batsu{border-radius:0 44px 0 0}
 
   /* soft colour bloom rising from the outer corner */
   .key::before{
@@ -262,14 +283,12 @@
   .key:focus-visible{outline:3px solid var(--ink);outline-offset:-6px}
   .key .glyph{
     position:relative;
-    font-size:clamp(44px,13vw,72px);line-height:1;font-weight:400;
+    font-size:clamp(58px,18vw,96px);line-height:1;font-weight:400;
   }
   .key.maru .glyph{color:var(--maru)}
   .key.batsu .glyph{color:var(--batsu)}
   html[data-theme="dark"] .key.maru .glyph{color:#F4584D}
   html[data-theme="dark"] .key.batsu .glyph{color:#5D8FEC}
-  .key .txt{position:relative;text-align:center;font-size:14px;font-weight:800;letter-spacing:.14em;text-indent:.14em}
-  .key small{display:block;font-size:9px;font-weight:600;color:var(--ink-soft);letter-spacing:.22em;text-indent:.22em;margin-top:3px}
 
   /* ---- clap (sits above the maru/batsu pair) ---- */
   .clapbar{
@@ -363,6 +382,8 @@
     max-width:340px;width:100%;
     box-shadow:0 30px 50px -24px rgba(0,0,0,.5);
     font-size:12.5px;line-height:1.85;color:var(--ink-soft);
+    /* the credits and the URL are worth being able to select and copy */
+    -webkit-user-select:text;user-select:text;
   }
   .sheet h2{
     margin:0 0 10px;font-size:11px;letter-spacing:.3em;text-indent:.3em;
@@ -429,7 +450,7 @@
     .paddle{transition:none}
     .paddle.pop,.pulse.go{animation:none}
     .note.on{animation:none}
-    .stage,.chip.turn span{transition:none}
+    .tapzone,.chip.turn span{transition:none}
   }
 </style>
 </head>
@@ -484,6 +505,8 @@
       </div>
     </div>
   </div>
+  <button class="half left" id="tapM" aria-label="正解（ピンポン）"></button>
+  <button class="half right" id="tapB" aria-label="不正解（ブー）"></button>
 </div>
 
 <div class="clapbar">
@@ -493,13 +516,11 @@
 </div>
 
 <div class="controls">
-  <button class="key maru" id="keyM">
+  <button class="key maru" id="keyM" aria-label="正解（ピンポン）">
     <span class="glyph">○</span>
-    <span class="txt">正解<small>PING PONG</small></span>
   </button>
-  <button class="key batsu" id="keyB">
+  <button class="key batsu" id="keyB" aria-label="不正解（ブー）">
     <span class="glyph">✕</span>
-    <span class="txt">不正解<small>BUZZER</small></span>
   </button>
 </div>
 
@@ -660,9 +681,24 @@
 
   function flip(){ fire(showing === 'maru' ? 'batsu' : 'maru'); }
 
-  document.getElementById('keyM').addEventListener('click', function(){ fire('maru'); });
-  document.getElementById('keyB').addEventListener('click', function(){ fire('batsu'); });
-  document.getElementById('keyC').addEventListener('click', function(){ fire('clap'); });
+  /* Sound on pointerdown, not click: click only lands once the finger lifts and
+     is dropped outright if the finger drifts, which is what made taps feel dead.
+     keydown keeps Enter/Space working for whoever tabs to the button. */
+  function bindFire(id, kind){
+    var el = document.getElementById(id);
+    el.addEventListener('pointerdown', function(e){
+      if(e.pointerType === 'mouse' && e.button !== 0) return;
+      fire(kind);
+    });
+    el.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); fire(kind); }
+    });
+  }
+  bindFire('keyM', 'maru');
+  bindFire('keyB', 'batsu');
+  bindFire('keyC', 'clap');
+  bindFire('tapM', 'maru');
+  bindFire('tapB', 'batsu');
 
   /* ---------- theme ---------- */
   var themeBtn = document.getElementById('theme');
@@ -676,7 +712,7 @@
   /* ---------- turn the toy to face the other person ---------- */
   var turnBtn = document.getElementById('turn');
   turnBtn.addEventListener('click', function(){
-    var facing = document.querySelector('.stage').classList.toggle('facing');
+    var facing = document.querySelector('.tapzone').classList.toggle('facing');
     turnBtn.setAttribute('aria-pressed', facing ? 'true' : 'false');
   });
 
