@@ -81,7 +81,10 @@
     perspective:1400px;
     width:100%;
     min-height:0;
+    transition:transform .5s cubic-bezier(.3,.8,.35,1);
   }
+  /* shown to someone sitting opposite: only the toy turns, the keys stay put */
+  .stage.facing{transform:rotate(180deg)}
   .tapzone{display:block}
 
   .paddle{
@@ -294,6 +297,16 @@
     position:fixed;top:max(10px,env(safe-area-inset-top));right:12px;
     display:flex;gap:8px;z-index:5;
   }
+  .corner-under{
+    position:fixed;top:max(48px,calc(env(safe-area-inset-top) + 38px));right:12px;
+    display:flex;gap:8px;z-index:5;
+  }
+  .chip[aria-pressed="true"].turn{
+    opacity:1;color:var(--ink);
+    border-color:var(--ink-soft);
+  }
+  .chip.turn span{display:block;transition:rotate .5s cubic-bezier(.3,.8,.35,1)}
+  .chip[aria-pressed="true"].turn span{rotate:180deg}
   .chip{
     width:30px;height:30px;border-radius:50%;
     border:1px solid var(--chip-edge);
@@ -416,6 +429,7 @@
     .paddle{transition:none}
     .paddle.pop,.pulse.go{animation:none}
     .note.on{animation:none}
+    .stage,.chip.turn span{transition:none}
   }
 </style>
 </head>
@@ -424,6 +438,10 @@
 <div class="corner">
   <button class="chip" id="theme" aria-label="背景を切り替える" aria-pressed="true">◐</button>
   <button class="chip" id="info" aria-label="キー操作と効果音のクレジット">i</button>
+</div>
+
+<div class="corner-under">
+  <button class="chip turn" id="turn" aria-label="相手に見せる向きに反転する" aria-pressed="false"><span>↻</span></button>
 </div>
 
 <div class="corner-left">
@@ -654,6 +672,13 @@
     themeBtn.setAttribute('aria-pressed', dark ? 'false' : 'true');
   }
   themeBtn.addEventListener('click', toggleTheme);
+
+  /* ---------- turn the toy to face the other person ---------- */
+  var turnBtn = document.getElementById('turn');
+  turnBtn.addEventListener('click', function(){
+    var facing = document.querySelector('.stage').classList.toggle('facing');
+    turnBtn.setAttribute('aria-pressed', facing ? 'true' : 'false');
+  });
 
   /* ---------- info sheet ---------- */
   var sheet = document.getElementById('sheet');
